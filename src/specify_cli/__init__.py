@@ -1571,6 +1571,7 @@ def init(
     steps_lines.append("   2.3 [cyan]/speckit.plan[/] - Create implementation plan")
     steps_lines.append("   2.4 [cyan]/speckit.tasks[/] - Generate actionable tasks")
     steps_lines.append("   2.5 [cyan]/speckit.implement[/] - Execute implementation")
+    steps_lines.append("   2.6 [cyan]/speckit.deployment[/] - Prepare deployment plan and rollout steps")
 
     steps_panel = Panel("\n".join(steps_lines), title="Next Steps", border_style="cyan", padding=(1,2))
     console.print()
@@ -2350,4 +2351,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -1,5 +1,8 @@
 ---
-description: Guide deployment options after implementation with selectable paths for local, Docker, and AWS.
+description: Create a deployment plan and rollout checklist based on the implementation plan and related artifacts.
+scripts:
+  sh: scripts/bash/check-prerequisites.sh --json
+  ps: scripts/powershell/check-prerequisites.ps1 -Json
 ---
 
 ## User Input
@@ -12,58 +15,66 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. Confirm this command runs after `/speckit.tasks` and `/speckit.implement`.
-2. Present a short menu of deployment paths and ask the user to choose one:
-   - Local run
-   - Docker
-   - AWS
-   - GCP (disabled)
-3. Display only the selected path's steps.
-4. If the user chooses GCP, clearly state it is disabled in this release.
+1. Run `{SCRIPT}` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-## Deployment Paths
+2. Load context:
+   - REQUIRED: `FEATURE_DIR/spec.md`
+   - REQUIRED: `FEATURE_DIR/plan.md`
+   - IF EXISTS (from AVAILABLE_DOCS): `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
 
-### Local Run (show only if selected)
+3. Generate or update `FEATURE_DIR/deployment.md` with a concrete deployment plan. Use this structure:
 
-- Explain that commands must be adapted to the current project.
-- Provide these example commands:
-  - `npm install && npm run build && npm run dev`
-  - `uvicorn main:app --reload`
-  - `poetry run python main`
+   ```markdown
+   # Deployment Plan: <Feature Name>
 
-### Docker (show only if selected)
+   ## Overview
+   - Summary of what is being deployed and why
+   - Intended environments (dev/staging/prod)
 
-- Provide these example commands:
-  - `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up --build -d`
-  - `docker compose up --build -d`
-- If no Docker configuration exists, instruct the user to create a
-  `Dockerfile` and `docker-compose.yml` before proceeding.
+   ## Deployment Model
+   - Hosting/runtime (e.g., containers, serverless, VM)
+   - Regions/zones and scaling assumptions
 
-### AWS (show only if selected)
+   ## Build & Packaging
+   - Build commands and artifacts
+   - Versioning and tagging strategy
 
-1. **Check prerequisites**
-   - Verify AWS CLI is installed.
-   - Verify required profiles exist. Example:
-     - `aws configure list-profiles| grep backend-pro`
-2. **Select AWS services**
-   - List services based on the Terraform description (e.g., ECR, ECS, S3, RDS,
-     ALB, NAT, API Gateway, Amplify).
-3. **Select environment**
-   - Choose from available Terraform environments: staging or prod.
-4. **Confirm variables**
-   - Ask the user to review `terraform.tfvars` before continuing.
-5. **Initialize**
-   - Run `terraform init` or a project-provided bootstrap script if available.
-6. **Plan**
-   - Run `terraform plan`.
-7. **Apply**
-   - Run `terraform apply`.
-8. **Status list**
-   - List AWS services with status labels:
-     - `[yellow]in progress[/yellow]`
-     - `[green]success[/green]`
-     - `[red]failed[/red]`
+   ## Configuration & Secrets
+   - Required environment variables
+   - Secret management approach
 
-### GCP (disabled)
+   ## Data & Migrations
+   - Schema changes or migrations
+   - Backfill or data integrity steps
+   ## Infrastructure Requirements
+   - Required services (databases, queues, caches, storage)
+   - IaC approach (if any)
 
-- GCP deployment is disabled in this release.
+   ## Rollout Plan
+   - Deployment sequence
+   - Progressive rollout/canary strategy (if applicable)
+
+   ## Observability & Alerts
+   - Logs, metrics, tracing
+   - Alert thresholds tied to success criteria
+
+   ## Validation & Smoke Tests
+   - Checklist of post-deploy verification steps
+   - Rollback criteria
+
+   ## Rollback Plan
+   - Revert steps and data recovery considerations
+
+   ## Open Questions
+   - [NEEDS CLARIFICATION: ...] for any missing or risky details
+   ```
+
+4. If the user input includes deployment preferences (cloud provider, CI/CD tool, regions, SLOs, etc.), incorporate them explicitly.
+
+5. If the required inputs are incomplete (plan/spec missing), stop and instruct to run `/speckit.plan` first.
+
+## Rules
+
+- Do not invent missing requirements. Use [NEEDS CLARIFICATION: ...].
+- Keep commands and paths consistent with the plan.
+- Prefer actionable, operator-ready steps over high-level prose.

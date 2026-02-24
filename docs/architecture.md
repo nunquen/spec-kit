@@ -28,6 +28,7 @@ The workflow centers on structured slash commands (`/speckit.specify`, `/speckit
 - `/speckit.plan` produces an implementation plan and supporting artifacts.
 - `/speckit.tasks` derives executable tasks from the plan.
 - `/speckit.implement` executes tasks using the agent and local tooling.
+- `/speckit.deployment` produces a deployment plan and rollout checklist.
 - `/speckit.deployment` guides deployment options after implementation.
 
 ### 3) Extensions (Optional)
