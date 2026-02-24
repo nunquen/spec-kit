@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Deployment Command**: Added `/speckit.deployment` guidance in CLI Next Steps and introduced a deployment command template for generating rollout plans.
+- **Template Source Override**: Added `SPECKIT_REPO=owner/name` to choose the release source for template downloads (default: `nunquen/spec-kit`).
 
 ## [0.1.6] - 2026-02-23
 

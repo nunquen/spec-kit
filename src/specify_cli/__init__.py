@@ -666,9 +666,20 @@ def merge_json_files(existing_path: Path, new_content: dict, verbose: bool = Fal
 
     return merged
 
+def _get_repo_owner_name() -> tuple[str, str]:
+    """Return repo owner/name for release downloads.
+
+    Use SPECKIT_REPO env override (format: owner/name). Defaults to nunquen/spec-kit.
+    """
+    repo = (os.getenv("SPECKIT_REPO") or "nunquen/spec-kit").strip()
+    if "/" not in repo:
+        # Fallback to defaults if malformed
+        return "nunquen", "spec-kit"
+    owner, name = repo.split("/", 1)
+    return owner, name
+
 def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Tuple[Path, dict]:
-    repo_owner = "github"
-    repo_name = "spec-kit"
+    repo_owner, repo_name = _get_repo_owner_name()
     if client is None:
         client = httpx.Client(verify=ssl_context)
 
@@ -1657,8 +1668,7 @@ def version():
             pass
     
     # Fetch latest template release version
-    repo_owner = "github"
-    repo_name = "spec-kit"
+    repo_owner, repo_name = _get_repo_owner_name()
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
     
     template_version = "unknown"
