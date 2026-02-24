@@ -151,7 +151,13 @@ build_variant() {
     esac
   fi
   
-  [[ -d templates ]] && { mkdir -p "$SPEC_DIR/templates"; find templates -type f -not -path "templates/commands/*" -not -name "vscode-settings.json" -exec cp --parents {} "$SPEC_DIR"/ \; ; echo "Copied templates -> .specify/templates"; }
+  if [[ -d templates ]]; then
+    mkdir -p "$SPEC_DIR/templates"
+    # macOS cp does not support --parents, so use tar for a portable copy.
+    tar -C templates --exclude "commands" --exclude "vscode-settings.json" -cf - . \
+      | tar -C "$SPEC_DIR/templates" -xf -
+    echo "Copied templates -> .specify/templates"
+  fi
   
   # NOTE: We substitute {ARGS} internally. Outward tokens differ intentionally:
   #   * Markdown/prompt (claude, copilot, cursor-agent, opencode): $ARGUMENTS
@@ -277,4 +283,3 @@ done
 
 echo "Archives in $GENRELEASES_DIR:"
 ls -1 "$GENRELEASES_DIR"/spec-kit-template-*-"${NEW_VERSION}".zip
-
